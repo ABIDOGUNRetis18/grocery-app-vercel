@@ -74,12 +74,12 @@ jobs:
 
       - name: Installer backend
         run: |
-          cd backend
+          cd Backend
           npm install
 
       - name: Vérifier serveur
         run: |
-          cd backend
+          cd Backend
           npm run server || echo "Serveur non lancé (normal en CI)"
 
   # =========================
