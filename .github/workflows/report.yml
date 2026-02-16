@@ -96,17 +96,10 @@ jobs:
       with:
         node-version: 18
 
-    # L'installation du CLI est déjà faite, mais on peut la garder
     - name: Installer Vercel CLI
       run: npm install -g vercel
 
     - name: Deploy frontend sur Vercel
       run: |
         cd frontend
-        # L'option --build-command est optionnelle si vercel.json contient déjà le build‑command
-        vercel \
-          --prod \
-          --yes \
-          --token ${{ secrets.VERCEL_TOKEN }} \
-          --build-command "npm run build" \
-          --output-directory "dist"
+        vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
