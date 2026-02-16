@@ -39,10 +39,20 @@ jobs:
         run: |
           cd frontend
           npm install
-      - name: Build Frontend
+      - name: Build frontend
         run: |
           cd frontend
+          npm install
           npm run build
+      - name: Check dist folder
+        run: |
+          if [ -d "frontend/dist" ]; then
+            echo "✅ dist exists"
+          else
+            echo "❌ dist missing! Build failed?"
+            exit 1
+          fi
+
 
   # =========================
   # 3. BACKEND
