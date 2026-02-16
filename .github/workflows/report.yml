@@ -106,7 +106,7 @@ jobs:
       - name: Deploy Frontend
         working-directory: frontend
         run: |
-          vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
 
   # =========================
   # 6. DEPLOIEMENT ADMIN SUR VERCEL (optionnel)
@@ -125,4 +125,5 @@ jobs:
       - name: Deploy Admin
         working-directory: admin
         run: |
-          vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+
