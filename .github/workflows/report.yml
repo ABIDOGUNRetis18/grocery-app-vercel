@@ -12,16 +12,14 @@ jobs:
   # =========================
   analyse:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Analyse README
         run: |
           echo "Projet détecté : Grocery Delivery Application"
-          echo "Frontend: React"
+          echo "Frontend: Vite + React"
           echo "Backend: Node + Express"
+          echo "Admin: React + Vite"
           echo "Database: MongoDB"
           echo "Auth: JWT"
 
@@ -31,25 +29,20 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     needs: analyse
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
-      - name: Installer frontend
+      - name: Installer Frontend
         run: |
           cd frontend
           npm install
-          npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
-
-      - name: Build frontend
+      - name: Build Frontend
         run: |
           cd frontend
-          npm run build || echo "Pas de build script"
+          npm run build
 
   # =========================
   # 3. BACKEND
@@ -57,24 +50,23 @@ jobs:
   backend:
     runs-on: ubuntu-latest
     needs: analyse
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - name: Installer Backend
         run: |
-          cd Backend
+          cd backend
           npm install
-
-      - name: Vérifier serveur
+      - name: Vérifier .env
         run: |
-          cd Backend
-          npm run server || echo "Serveur non lancé (normal en CI)"
+          if [ -f backend/.env ]; then
+            echo ".env existe"
+          else
+            echo "⚠️ .env manquant, configurer en prod"
+          fi
 
   # =========================
   # 4. ADMIN
@@ -82,71 +74,55 @@ jobs:
   admin:
     runs-on: ubuntu-latest
     needs: analyse
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Installer admin
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Installer Admin
         run: |
           cd admin
           npm install
-
-      - name: Build admin
+      - name: Build Admin
         run: |
           cd admin
-          npm run build || echo "Pas de build"
+          npm run build || echo "Pas de build requis"
 
   # =========================
-  # 5. CONFIG ENV + DB
-  # =========================
-  config:
-    runs-on: ubuntu-latest
-    needs: [frontend, backend, admin]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Vérifier .env
-        run: |
-          if [ -f Backend/.env ]; then
-            echo ".env existe"
-          else
-            echo "⚠️ .env manquant (à configurer en prod)"
-          fi
-
-      - name: Vérifier MongoDB
-        run: |
-          echo "MongoDB requis pour ce projet"
-          
-  # =========================
-  # 6. DEPLOIEMENT FRONTEND (VERCEL)
-  # =========================
-    # =========================
-  # 6. DEPLOIEMENT FRONTEND (VERCEL)
+  # 5. DEPLOIEMENT FRONTEND SUR VERCEL
   # =========================
   deploy-frontend:
     runs-on: ubuntu-latest
-    needs: config
-
-    defaults:
-      run:
-        working-directory: frontend
-
+    needs: [frontend]
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - name: Installer Vercel CLI
         run: npm install -g vercel
+      - name: Deploy Frontend
+        working-directory: frontend
+        run: |
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Pull config Vercel
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build projet
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+  # =========================
+  # 6. DEPLOIEMENT ADMIN SUR VERCEL (optionnel)
+  # =========================
+  deploy-admin:
+    runs-on: ubuntu-latest
+    needs: [admin]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Installer Vercel CLI
+        run: npm install -g vercel
+      - name: Deploy Admin
+        working-directory: admin
+        run: |
+          vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
