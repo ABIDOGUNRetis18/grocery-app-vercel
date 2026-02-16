@@ -65,14 +65,14 @@ jobs:
         with:
           node-version: 18
 
-      - name: Installer backend
+      - name: Installer Backend
         run: |
-          cd backend
+          cd Backend
           npm install
 
       - name: Vérifier serveur
         run: |
-          cd backend
+          cd Backend
           npm run server || echo "Serveur non lancé (normal en CI)"
 
   # =========================
@@ -107,7 +107,7 @@ jobs:
 
       - name: Vérifier .env
         run: |
-          if [ -f backend/.env ]; then
+          if [ -f Backend/.env ]; then
             echo ".env existe"
           else
             echo "⚠️ .env manquant (à configurer en prod)"
