@@ -89,17 +89,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: frontend
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
 
-      - name: Installer Vercel CLI
-        run: npm install -g vercel
+    # L'installation du CLI est déjà faite, mais on peut la garder
+    - name: Installer Vercel CLI
+      run: npm install -g vercel
 
-      - name: Deploy frontend sur Vercel
-        run: |
-          cd frontend
-          vercel --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
+    - name: Deploy frontend sur Vercel
+      run: |
+        cd frontend
+        # L'option --build-command est optionnelle si vercel.json contient déjà le build‑command
+        vercel \
+          --prod \
+          --yes \
+          --token ${{ secrets.VERCEL_TOKEN }} \
+          --build-command "npm run build" \
+          --output-directory "dist"
