@@ -58,11 +58,11 @@ jobs:
           node-version: 18
       - name: Installer Backend
         run: |
-          cd backend
+          cd Backend
           npm install
       - name: Vérifier .env
         run: |
-          if [ -f backend/.env ]; then
+          if [ -f Backend/.env ]; then
             echo ".env existe"
           else
             echo "⚠️ .env manquant, configurer en prod"
